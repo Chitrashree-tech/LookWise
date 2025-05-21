@@ -33,8 +33,10 @@ class _ShopForOccasionsPageState extends State<ShopForOccasionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shop for Occasions',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Shop for Occasions',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: const Color(0xFFFF008A),
       ),
       body: SingleChildScrollView(
@@ -43,58 +45,70 @@ class _ShopForOccasionsPageState extends State<ShopForOccasionsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. Categorized Occasions
-            const Text('Choose an Occasion:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            const Text(
+              'Choose an Occasion:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 10),
             Wrap(
               spacing: 8.0,
-              children: _occasions.map((occasion) {
-                return ChoiceChip(
-                  label: Text(occasion),
-                  selected: _selectedOccasion == occasion,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedOccasion = selected ? occasion : null;
-                    });
-                  },
-                  selectedColor: const Color(0xFFFF008A).withOpacity(0.7),
-                  labelStyle: TextStyle(
-                    color: _selectedOccasion == occasion
-                        ? Colors.white
-                        : Colors.black87,
-                  ),
-                );
-              }).toList(),
+              children:
+                  _occasions.map((occasion) {
+                    return ChoiceChip(
+                      label: Text(occasion),
+                      selected: _selectedOccasion == occasion,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedOccasion = selected ? occasion : null;
+                        });
+                      },
+                      selectedColor: const Color(0xFFFF008A).withOpacity(0.7),
+                      labelStyle: TextStyle(
+                        color:
+                            _selectedOccasion == occasion
+                                ? Colors.white
+                                : Colors.black87,
+                      ),
+                    );
+                  }).toList(),
             ),
             const SizedBox(height: 20),
 
             // 2. Style Filters
-            const Text('Filter by Style (Optional):',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            const Text(
+              'Filter by Style (Optional):',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 10),
             Wrap(
               spacing: 8.0,
-              children: _styles.map((style) {
-                return ChoiceChip(
-                  label: Text(style),
-                  selected: _selectedStyle == style,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedStyle = selected ? style : null;
-                    });
-                  },
-                  selectedColor: const Color(0xFFFF008A).withOpacity(0.7),
-                  labelStyle: TextStyle(
-                    color: _selectedStyle == style ? Colors.white : Colors.black87,
-                  ),
-                );
-              }).toList(),
+              children:
+                  _styles.map((style) {
+                    return ChoiceChip(
+                      label: Text(style),
+                      selected: _selectedStyle == style,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedStyle = selected ? style : null;
+                        });
+                      },
+                      selectedColor: const Color(0xFFFF008A).withOpacity(0.7),
+                      labelStyle: TextStyle(
+                        color:
+                            _selectedStyle == style
+                                ? Colors.white
+                                : Colors.black87,
+                      ),
+                    );
+                  }).toList(),
             ),
             const SizedBox(height: 20),
 
             // 3. Price Range Filter
-            const Text('Filter by Price Range (Optional):',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            const Text(
+              'Filter by Price Range (Optional):',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 10),
             RangeSlider(
               values: _priceRange,
@@ -122,14 +136,17 @@ class _ShopForOccasionsPageState extends State<ShopForOccasionsPage> {
             const SizedBox(height: 20),
 
             // 4. User Input for Occasion Description
-            const Text('Describe the Occasion (Optional):',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            const Text(
+              'Describe the Occasion (Optional):',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 10),
             TextField(
               maxLines: 3,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'e.g., "a beach wedding in the evening", "a formal business dinner"',
+                hintText:
+                    'e.g., "a beach wedding in the evening", "a formal business dinner"',
               ),
               onChanged: (value) {
                 setState(() {
@@ -140,29 +157,42 @@ class _ShopForOccasionsPageState extends State<ShopForOccasionsPage> {
             const SizedBox(height: 30),
 
             // 5. Inspiration Boards (Now moved up)
-            const Text('Inspiration for Different Occasions:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            const Text(
+              'Inspiration for Different Occasions:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 10),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
                   _buildInspirationCard(
-                      'Formal', 'assets/formal_inspiration.jpg', 0.6),
+                    'Formal',
+                    'assets/formal_inspiration.jpg',
+                    0.6,
+                  ),
                   const SizedBox(width: 10),
                   _buildInspirationCard(
-                      'Casual', 'assets/casual_inspiration.jpg', 0.6),
+                    'Casual',
+                    'assets/casual_inspiration.jpg',
+                    0.6,
+                  ),
                   const SizedBox(width: 10),
                   _buildInspirationCard(
-                      'Party', 'assets/party_inspiration.jpg', 0.6),
+                    'Party',
+                    'assets/party_inspiration.jpg',
+                    0.6,
+                  ),
                   const SizedBox(width: 10),
                   _buildInspirationCard(
-                      'Work', 'assets/work_inspiration.jpg', 0.6),
+                    'Work',
+                    'assets/work_inspiration.jpg',
+                    0.6,
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 30), // Added some space after inspiration
-
             // 6. Button to trigger search/suggestions (Now at the end)
             SizedBox(
               width: double.infinity,
@@ -171,7 +201,9 @@ class _ShopForOccasionsPageState extends State<ShopForOccasionsPage> {
                   // TODO: Implement logic to fetch outfit suggestions based on selected filters
                   print('Selected Occasion: $_selectedOccasion');
                   print('Selected Style: $_selectedStyle');
-                  print('Price Range: ${_priceRange.start} - ${_priceRange.end}');
+                  print(
+                    'Price Range: ${_priceRange.start} - ${_priceRange.end}',
+                  );
                   print('Occasion Description: $_occasionDescription');
                   // Navigate to a page displaying outfit suggestions
                 },
@@ -212,10 +244,7 @@ class _ShopForOccasionsPageState extends State<ShopForOccasionsPage> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-              ),
+              Image.asset(imagePath, fit: BoxFit.cover),
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -234,9 +263,10 @@ class _ShopForOccasionsPageState extends State<ShopForOccasionsPage> {
                 child: Text(
                   title,
                   style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],

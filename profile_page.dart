@@ -8,10 +8,18 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController _emailController = TextEditingController(text: 'user@example.com');
-  final TextEditingController _phoneController = TextEditingController(text: '9876543210');
-  final TextEditingController _fullNameController = TextEditingController(text: 'John Doe');
-  final TextEditingController _dobController = TextEditingController(text: '01/01/2000');
+  final TextEditingController _emailController = TextEditingController(
+    text: 'user@example.com',
+  );
+  final TextEditingController _phoneController = TextEditingController(
+    text: '9876543210',
+  );
+  final TextEditingController _fullNameController = TextEditingController(
+    text: 'John Doe',
+  );
+  final TextEditingController _dobController = TextEditingController(
+    text: '01/01/2000',
+  );
   String _selectedGender = 'Female';
 
   Future<void> _selectDate(BuildContext context) async {
@@ -36,9 +44,9 @@ class _ProfilePageState extends State<ProfilePage> {
     print('Date of Birth: ${_dobController.text}');
     print('Gender: $_selectedGender');
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile Saved! (Simulated)')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Profile Saved! (Simulated)')));
   }
 
   void _editProfile() {
@@ -193,7 +201,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: _editProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -207,7 +218,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: _saveProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF008A),
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

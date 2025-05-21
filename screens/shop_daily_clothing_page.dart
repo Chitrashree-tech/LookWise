@@ -12,7 +12,9 @@ class ShopDailyClothingPage extends StatelessWidget {
           "Shop Daily Clothing",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        iconTheme: const IconThemeData(color: Colors.white), // For back button if needed
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ), // For back button if needed
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -33,9 +35,7 @@ class ShopDailyClothingPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(right: 10.0),
-                      child: Chip(
-                        label: Text(_clothingCategories[index]),
-                      ),
+                      child: Chip(label: Text(_clothingCategories[index])),
                     );
                   },
                 ),
@@ -73,7 +73,10 @@ class ShopDailyClothingPage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
-                              Text("Item Name", style: TextStyle(fontWeight: FontWeight.bold)),
+                              Text(
+                                "Item Name",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                               Text("Price"),
                             ],
                           ),

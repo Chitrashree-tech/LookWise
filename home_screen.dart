@@ -24,7 +24,9 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 20), // Added vertical space at the top
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start, // Align items to the start (top)
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start, // Align items to the start (top)
                     children: [
                       Expanded(
                         child: Column(
@@ -49,7 +51,9 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 16), // Add some space between text and avatar
+                      const SizedBox(
+                        width: 16,
+                      ), // Add some space between text and avatar
                       const CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: 35,
@@ -64,7 +68,9 @@ class HomeScreen extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushNamed(context, '/signin');
                         },
-                        style: TextButton.styleFrom(foregroundColor: Colors.white),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                        ),
                         child: const Text(
                           "Sign In",
                           style: TextStyle(fontSize: 18),
@@ -83,7 +89,10 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 10,
+                          ),
                           child: Text(
                             "Sign Up",
                             style: TextStyle(fontSize: 18),
@@ -100,9 +109,7 @@ class HomeScreen extends StatelessWidget {
             // 🔷 White Section with Tagline and Feature Descriptions
             Container(
               width: double.infinity,
-              constraints: BoxConstraints(
-                minHeight: screenHeight * 0.65,
-              ),
+              constraints: BoxConstraints(minHeight: screenHeight * 0.65),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
@@ -116,9 +123,18 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  _buildFeatureDescription(context, "Get weather-based outfit suggestions to stay stylish and comfortable."),
-                  _buildFeatureDescription(context, "Discover trendy outfits that fit your budget and preferences."),
-                  _buildFeatureDescription(context, "Explore personalized clothing recommendations from top online platforms."),
+                  _buildFeatureDescription(
+                    context,
+                    "Get weather-based outfit suggestions to stay stylish and comfortable.",
+                  ),
+                  _buildFeatureDescription(
+                    context,
+                    "Discover trendy outfits that fit your budget and preferences.",
+                  ),
+                  _buildFeatureDescription(
+                    context,
+                    "Explore personalized clothing recommendations from top online platforms.",
+                  ),
                   const SizedBox(height: 30),
                 ],
               ),

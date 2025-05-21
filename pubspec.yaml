@@ -1,4 +1,4 @@
-name: app_pro
+name: lookwise_app
 description: "A new Flutter project."
 publish_to: 'none'
 
@@ -10,9 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  http: ^1.3.0 # You already have http, that's good if you need it
-  intl: ^0.19.0 # Add the intl package here (check pub.dev for the latest version)
+  cupertino_icons: ^1.0.6 # Or whatever version you have
+  intl: ^0.18.1 # Assuming you've already added this for the previous error
+  http: ^1.2.1 # Use the latest stable version of http
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +21,18 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/cool_veins.png
+    - assets/images/warm_veins.png
+    - assets/images/neutral_veins.png
+    - assets/images/body_measurements_diagram.png
+    - assets/images/face_oval.png      # <--- ADD THESE LINES
+    - assets/images/face_square.png
+    - assets/images/face_heart.png
+    - assets/images/face_round.png
+    - assets/images/face_diamond.png
+    - assets/images/features_background_image.png
+    - assets/images/girls_cutout.png
+    - assets/images/profile_icon_design.png
+  # Ensure you include all individual image paths here
