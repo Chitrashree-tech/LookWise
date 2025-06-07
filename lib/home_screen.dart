@@ -8,145 +8,252 @@ class HomeScreen extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // 🔷 Pink Header Section (Sign In/Sign Up remains)
-            Container(
-              height: screenHeight * 0.35,
-              width: double.infinity,
-              color: const Color(0xFFFF008A),
-              padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20), // Added vertical space at the top
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start, // Align items to the start (top)
+      backgroundColor: Colors.white, // Fallback background color
+      body: Stack(
+        children: [
+          // Background Image
+          Positioned.fill(
+            child: Image.asset(
+              "assets/background.png", // Ensure this path is correct and image is in pubspec.yaml
+              fit: BoxFit.cover,
+            ),
+          ),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                // 🔷 Pink Header Section
+                Container(
+                  height: screenHeight * 0.35,
+                  width: double.infinity,
+                  color: const Color(
+                    0xFFFF008A,
+                  ).withOpacity(0.9), // Pink with increased transparency
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              "LookWise..",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // LookWise Logo (assuming it's an asset)
+                                Image.asset(
+                                  "assets/logo.png", // Path to your 'LookWise' logo asset
+                                  height: 60, // Adjusted height for better fit
+                                ),
+                                const SizedBox(height: 10),
+                                const Text(
+                                  "A personalised virtual stylist",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 22,
+                                    fontFamily:
+                                        'OpenSans', // Example font, ensure it's in pubspec.yaml
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          // Profile Icon (moved here from AppBar)
+                          InkWell(
+                            onTap: () {
+                              // Navigator.pushNamed(context, '/profile'); // Example navigation
+                            },
+                            child: CircleAvatar(
+                              radius: 35, // Larger radius for visibility
+                              backgroundColor: Colors.white,
+                              child: ClipOval(
+                                child: Image.asset(
+                                  "assets/profile_icon_design.png", // Path to your profile icon asset
+                                  fit: BoxFit.cover,
+                                  width: 70, // Matches radius * 2
+                                  height: 70, // Matches radius * 2
+                                ),
                               ),
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              "A personalised virtual stylist",
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 22,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16), // Add some space between text and avatar
-                      const CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 35,
-                      ),
+                      const Spacer(),
+                      // Sign In / Sign Up removed from header, moved to bottom
                     ],
                   ),
-                  const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                ),
+
+                // 🔷 "Style Made Just for You!" Section
+                Container(
+                  width: double.infinity,
+                  color: Colors.white.withOpacity(
+                    0.7,
+                  ), // White with transparency to show background
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 30,
+                    horizontal: 20,
+                  ),
+                  child: Text(
+                    "Style Made Just for You!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color(0xFFFF008A),
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      fontFamily:
+                          'Lato', // Example font, ensure it's in pubspec.yaml
+                    ),
+                  ),
+                ),
+
+                // 🔷 Feature Descriptions Section
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 30,
+                  ),
+                  // No specific background color here, letting Stack handle it
+                  child: Column(
                     children: [
-                      TextButton(
+                      _buildFeatureDescription(
+                        context,
+                        "Weather-Based Outfit Suggestions",
+                      ),
+                      _buildFeatureDescription(
+                        context,
+                        "Find trendy outfits within your price range",
+                      ),
+                      _buildFeatureDescription(
+                        context,
+                        "Get personalized recommendations from Amazon, Flipkart, Myntra & more.",
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ), // Space before Sign In/Sign Up
+                    ],
+                  ),
+                ),
+
+                // 🔷 Sign In / Sign Up Choices (at the bottom)
+                Container(
+                  width: double.infinity,
+                  color:
+                      Colors
+                          .transparent, // No explicit background, let Stack handle it
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 20,
+                  ),
+                  child: Column(
+                    children: [
+                      ElevatedButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/signin');
                         },
-                        style: TextButton.styleFrom(foregroundColor: Colors.white),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white.withOpacity(
+                            0.9,
+                          ), // Transparent white
+                          foregroundColor: const Color(0xFFFF008A), // Pink text
+                          side: const BorderSide(
+                            color: Color(0xFFFF008A),
+                            width: 1.5,
+                          ), // Pink border
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 15,
+                            horizontal: 50,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              30,
+                            ), // Rounded corners
+                          ),
+                          elevation: 0, // No shadow
+                        ),
                         child: const Text(
                           "Sign In",
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/signup');
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFFFF008A),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                          backgroundColor: Colors.white.withOpacity(
+                            0.9,
+                          ), // Transparent white
+                          foregroundColor: const Color(0xFFFF008A), // Pink text
+                          side: const BorderSide(
+                            color: Color(0xFFFF008A),
+                            width: 1.5,
+                          ), // Pink border
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 15,
+                            horizontal: 50,
                           ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              30,
+                            ), // Rounded corners
+                          ),
+                          elevation: 0, // No shadow
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                          child: Text(
-                            "Sign Up",
-                            style: TextStyle(fontSize: 18),
+                        child: const Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                ],
-              ),
+                ),
+                const SizedBox(height: 20), // Padding at the very bottom
+              ],
             ),
-
-            // 🔷 White Section with Tagline and Feature Descriptions
-            Container(
-              width: double.infinity,
-              constraints: BoxConstraints(
-                minHeight: screenHeight * 0.65,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  const SizedBox(height: 40),
-                  const Text(
-                    "Here's what LookWise offers:",
-                    style: TextStyle(
-                      color: Color(0xFFFF008A),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  _buildFeatureDescription(context, "Get weather-based outfit suggestions to stay stylish and comfortable."),
-                  _buildFeatureDescription(context, "Discover trendy outfits that fit your budget and preferences."),
-                  _buildFeatureDescription(context, "Explore personalized clothing recommendations from top online platforms."),
-                  const SizedBox(height: 30),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   static Widget _buildFeatureDescription(BuildContext context, String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: ElevatedButton(
-        onPressed: null, // Set onPressed to null to disable the button effect
+        onPressed: null, // Set onPressed to null to disable button interaction
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.white.withOpacity(
+            0.9,
+          ), // White with transparency
           foregroundColor: const Color(0xFFFF008A),
-          side: const BorderSide(color: Color(0xFFFF008A)),
-          padding: const EdgeInsets.symmetric(vertical: 18),
+          side: const BorderSide(
+            color: Color(0xFFFF008A),
+            width: 1.5,
+          ), // Pink border
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(30), // Highly rounded corners
           ),
+          elevation: 0, // No shadow
         ),
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 16),
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: 'OpenSans',
+          ), // Example font
         ),
       ),
     );

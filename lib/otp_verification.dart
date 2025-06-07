@@ -9,8 +9,10 @@ class OTPVerificationPage extends StatefulWidget {
 }
 
 class _OTPVerificationPageState extends State<OTPVerificationPage> {
-  final List<TextEditingController> _phoneOTPControllers =
-  List.generate(4, (_) => TextEditingController());
+  final List<TextEditingController> _phoneOTPControllers = List.generate(
+    4,
+    (_) => TextEditingController(),
+  );
 
   bool _isPhoneVerified = false;
 
@@ -27,10 +29,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
         try {
           final response = await http.post(
             Uri.parse(apiUrl),
-            body: {
-              'otp': otpCode,
-              'identifier': userIdentifier,
-            },
+            body: {'otp': otpCode, 'identifier': userIdentifier},
           );
 
           if (response.statusCode == 200) {
@@ -40,10 +39,15 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
             setState(() {
               _isPhoneVerified = true;
             });
-            Navigator.pushNamed(context, '/create_profile'); // Navigate after successful phone verification
+            Navigator.pushNamed(
+              context,
+              '/create_profile',
+            ); // Navigate after successful phone verification
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Invalid Phone OTP. Please try again.')),
+              const SnackBar(
+                content: Text('Invalid Phone OTP. Please try again.'),
+              ),
             );
           }
         } catch (error) {
@@ -166,10 +170,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
         ),
         TextButton(
           onPressed: () {},
-          child: const Text(
-            "Resend OTP",
-            style: TextStyle(color: Colors.blue),
-          ),
+          child: const Text("Resend OTP", style: TextStyle(color: Colors.blue)),
         ),
       ],
     );
@@ -211,8 +212,9 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                     height: constraints.maxHeight,
                     child: SingleChildScrollView(
                       child: ConstrainedBox(
-                        constraints:
-                        BoxConstraints(minHeight: constraints.maxHeight),
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
                         child: IntrinsicHeight(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -229,7 +231,9 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                               const SizedBox(height: 30),
                               buildLabel("Phone Number"),
                               buildInputRow(
-                                  "Enter Phone Number", Icons.check_circle_outline),
+                                "Enter Phone Number",
+                                Icons.check_circle_outline,
+                              ),
                               const SizedBox(height: 16),
                               buildOTPBoxes("phone"),
                               const SizedBox(height: 12),

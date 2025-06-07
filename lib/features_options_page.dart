@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'screens/shop_daily_clothing_page.dart';
-import 'screens/daily_outfit_suggestions_page.dart';
-import 'screens/shop_for_occasions_page.dart';
-import 'screens/restyle_my_wardrode_page.dart';
-import 'screens/cart_page.dart';
-import 'screens/chatbot_page.dart';
 
 class Feature {
   final String name;
   final IconData icon;
-  final String route;
+  final String route; // Add a route for each feature
 
   Feature({required this.name, required this.icon, required this.route});
 }
@@ -18,13 +12,30 @@ class FeaturePage extends StatelessWidget {
   FeaturePage({super.key});
 
   final List<Feature> features = [
-    Feature(name: 'Shop Daily Clothing', icon: Icons.shopping_bag, route: '/shop_daily_clothing'),
-    Feature(name: 'Daily Outfit Suggestions', icon: Icons.today, route: '/daily_outfit_suggestions'),
-    Feature(name: 'Shop for Occasions', icon: Icons.event, route: '/shop_for_occasions'),
-    Feature(name: 'Restyle my wardrobe', icon: Icons.checkroom, route: '/restyle_my_wardrobe'),
+    Feature(
+      name: 'Shop Daily Clothing',
+      icon: Icons.shopping_bag,
+      route: '/shop_daily_clothing',
+    ),
+    Feature(
+      name: 'Daily Outfit Suggestions',
+      icon: Icons.today,
+      route: '/daily_outfit_suggestions',
+    ),
+    Feature(
+      name: 'Shop for Occasions',
+      icon: Icons.event,
+      route: '/shop_for_occasions',
+    ),
+    Feature(
+      name: 'Restyle my wardrobe',
+      icon: Icons.checkroom,
+      route: '/restyle_my_wardrobe',
+    ),
     Feature(name: 'Chatbot', icon: Icons.smart_toy, route: '/chatbot'),
   ];
 
+  // Assuming you have access to this list of saved suggestions
   final List<String> savedSuggestions = [
     'Outfit Idea 1',
     'Accessory 2',
@@ -52,10 +63,10 @@ class FeaturePage extends StatelessWidget {
         title: const Text(
           "LookWise..",
           style: TextStyle(
-            fontSize: 28,
+            fontSize: 18,
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontStyle: FontStyle.italic,
+            // REMOVED: fontStyle: FontStyle.italic,
           ),
         ),
         actions: [
@@ -79,9 +90,7 @@ class FeaturePage extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Color(0xFFFF008A),
-              ),
+              decoration: const BoxDecoration(color: Color(0xFFFF008A)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +98,11 @@ class FeaturePage extends StatelessWidget {
                   CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 30,
-                    child: Icon(Icons.person, size: 40, color: Color(0xFFFF008A)),
+                    child: Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Color(0xFFFF008A),
+                    ),
                   ),
                   SizedBox(height: 10),
                   Text(
@@ -120,6 +133,7 @@ class FeaturePage extends StatelessWidget {
               },
             ),
             const Divider(),
+            // Saved Suggestions Section in Drawer
             if (savedSuggestions.isNotEmpty) ...[
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -129,15 +143,18 @@ class FeaturePage extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: 120,
+                height: 120, // Adjust height as needed
                 child: ListView.builder(
                   itemCount: savedSuggestions.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Text(savedSuggestions[index]),
                       onTap: () {
-                        Navigator.pop(context);
-                        // You can implement navigation or action for saved suggestion here
+                        Navigator.pop(context); // Close the drawer
+                        // You can navigate to a detailed view of the suggestion here
+                        print(
+                          'Tapped on saved suggestion: ${savedSuggestions[index]}',
+                        );
                       },
                     );
                   },
@@ -156,85 +173,96 @@ class FeaturePage extends StatelessWidget {
           ],
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ListView.builder(
-                  itemCount: features.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 4,
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        leading: CircleAvatar(
-                          backgroundColor: const Color(0xFFFF008A),
-                          child: Icon(
-                            features[index].icon,
-                            color: Colors.white,
-                          ),
-                        ),
-                        title: Text(
-                          features[index].name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        onTap: () {
-                          if (features[index].name == 'Chatbot') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const ChatbotPage()),
-                            );
-                          } else {
-                            Navigator.pushNamed(context, features[index].route);
-                          }
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
+      body: Stack(
+        children: [
+          // Background Image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/features_background_image.png',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(color: Colors.grey.shade200);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CartPage()),
-                    );
-                  },
-                  icon: const Icon(Icons.shopping_cart, color: Colors.white),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF008A),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  label: const Text(
-                    "View Cart",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: ListView.builder(
+                      itemCount: features.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          color: Colors.white.withOpacity(0.85),
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            leading: CircleAvatar(
+                              backgroundColor: const Color(0xFFFF008A),
+                              child: Icon(
+                                features[index].icon,
+                                color: Colors.white,
+                              ),
+                            ),
+                            title: Text(
+                              features[index].name,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                features[index].route,
+                              );
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/home');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF008A),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Text(
+                        "Sign Out",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

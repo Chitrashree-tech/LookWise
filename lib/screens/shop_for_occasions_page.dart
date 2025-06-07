@@ -1,41 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import '../cart_manager.dart';
-import '../models/cart_item.dart';
-import 'cart_page.dart';
 
-// --- Google Custom Search API credentials ---
-const String apiKey = "AIzaSyDgD17God6JdvtULPEJh3I5eitQOJKCaYE";
-const String cx = "92adab9f992d345ee";
-
-// --- Function to fetch images from Google Custom Search ---
-Future<List<Map<String, String>>> fetchOutfitImages(String query) async {
-  final url =
-      'https://www.googleapis.com/customsearch/v1?q=${Uri.encodeComponent("female $query")}'
-      '&key=$apiKey'
-      '&cx=$cx'
-      '&searchType=image'
-      '&safe=active'
-      '&num=8';
-
-  final response = await http.get(Uri.parse(url));
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    final items = data['items'] as List<dynamic>? ?? [];
-    return items.map<Map<String, String>>((item) {
-      return {
-        'title': item['title'] ?? '',
-        'image': item['link'] ?? '',
-      };
-    }).toList();
-  } else {
-    print('Search API error: ${response.statusCode} ${response.body}');
-    throw Exception('Failed to fetch search results');
-  }
-}
-
-// --- Shop for Occasions Page ---
 class ShopForOccasionsPage extends StatefulWidget {
   const ShopForOccasionsPage({super.key});
 
@@ -44,350 +8,269 @@ class ShopForOccasionsPage extends StatefulWidget {
 }
 
 class _ShopForOccasionsPageState extends State<ShopForOccasionsPage> {
-  String? _occasion;
-  String? _style;
-  String? _dressType;
-  double? _budget = 100;
-  String? _note;
-
-  bool _loading = false;
+  String? _selectedOccasion;
+  String? _selectedStyle;
+  RangeValues _priceRange = const RangeValues(0, 500); // Example price range
+  String? _occasionDescription;
 
   final List<String> _occasions = [
-    'Wedding',
-    'Party',
-    'Business Meeting',
-    'Casual Outing',
-    'Festival',
-    'Other',
+    'Formal Events',
+    'Casual Outings',
+    'Special Events',
+    'Work/Professional',
   ];
+
   final List<String> _styles = [
+    'Bohemian',
+    'Minimalist',
     'Classic',
     'Trendy',
     'Elegant',
-    'Bohemian',
-    'Minimalist',
-    'Edgy',
-  ];
-  final List<String> _dressTypes = [
-    'Gown',
-    'Kurta',
-    'Saree',
-    'Blazer',
-    'Dress',
-    'Jeans',
-    'T-shirt',
+    'Casual',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shop for Occasions'),
+        title: const Text(
+          'Shop for Occasions',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: const Color(0xFFFF008A),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const CartPage()));
-            },
-          ),
-        ],
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. Categorized Occasions
+            const Text(
+              'Choose an Occasion:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8.0,
+              children:
+                  _occasions.map((occasion) {
+                    return ChoiceChip(
+                      label: Text(occasion),
+                      selected: _selectedOccasion == occasion,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedOccasion = selected ? occasion : null;
+                        });
+                      },
+                      selectedColor: const Color(0xFFFF008A).withOpacity(0.7),
+                      labelStyle: TextStyle(
+                        color:
+                            _selectedOccasion == occasion
+                                ? Colors.white
+                                : Colors.black87,
+                      ),
+                    );
+                  }).toList(),
+            ),
+            const SizedBox(height: 20),
+
+            // 2. Style Filters
+            const Text(
+              'Filter by Style (Optional):',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8.0,
+              children:
+                  _styles.map((style) {
+                    return ChoiceChip(
+                      label: Text(style),
+                      selected: _selectedStyle == style,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedStyle = selected ? style : null;
+                        });
+                      },
+                      selectedColor: const Color(0xFFFF008A).withOpacity(0.7),
+                      labelStyle: TextStyle(
+                        color:
+                            _selectedStyle == style
+                                ? Colors.white
+                                : Colors.black87,
+                      ),
+                    );
+                  }).toList(),
+            ),
+            const SizedBox(height: 20),
+
+            // 3. Price Range Filter
+            const Text(
+              'Filter by Price Range (Optional):',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 10),
+            RangeSlider(
+              values: _priceRange,
+              min: 0,
+              max: 1000, // Example max price
+              divisions: 5,
+              labels: RangeLabels(
+                '\$${_priceRange.start.round()}',
+                '\$${_priceRange.end.round()}',
+              ),
+              activeColor: const Color(0xFFFF008A),
+              onChanged: (RangeValues values) {
+                setState(() {
+                  _priceRange = values;
+                });
+              },
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Occasion
-                const Text(
-                  "What is the occasion?",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  children: _occasions.map((o) {
-                    return ChoiceChip(
-                      label: Text(o),
-                      selected: _occasion == o,
-                      selectedColor: const Color(0xFFFF008A),
-                      labelStyle: TextStyle(
-                        color: _occasion == o ? Colors.white : Colors.black,
-                      ),
-                      onSelected: (selected) {
-                        setState(() {
-                          _occasion = selected ? o : null;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 28),
-
-                // Style
-                const Text(
-                  "What style do you prefer?",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  children: _styles.map((s) {
-                    return ChoiceChip(
-                      label: Text(s),
-                      selected: _style == s,
-                      selectedColor: const Color(0xFFFF008A),
-                      labelStyle: TextStyle(
-                        color: _style == s ? Colors.white : Colors.black,
-                      ),
-                      onSelected: (selected) {
-                        setState(() {
-                          _style = selected ? s : null;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 28),
-
-                // Dress Type
-                const Text(
-                  "What type of dress or outfit are you looking for?",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  children: _dressTypes.map((d) {
-                    return ChoiceChip(
-                      label: Text(d),
-                      selected: _dressType == d,
-                      selectedColor: const Color(0xFFFF008A),
-                      labelStyle: TextStyle(
-                        color: _dressType == d ? Colors.white : Colors.black,
-                      ),
-                      onSelected: (selected) {
-                        setState(() {
-                          _dressType = selected ? d : null;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 28),
-
-                // Budget
-                const Text(
-                  "What is your budget for this outfit?",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 10),
-                Slider(
-                  value: _budget ?? 100,
-                  min: 0,
-                  max: 1000,
-                  divisions: 20,
-                  label: "\$${_budget?.round() ?? 100}",
-                  onChanged: (val) {
-                    setState(() {
-                      _budget = val;
-                    });
-                  },
-                ),
-                Text(_budget == null ? "No budget set" : "Budget: \$${_budget!.round()}"),
-                const SizedBox(height: 28),
-
-                // Notes
-                const Text(
-                  "Any special notes or requirements?",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "e.g., prefer eco-friendly fabrics, need plus size, etc.",
-                  ),
-                  onChanged: (val) => _note = val,
-                ),
-                const SizedBox(height: 40),
-
-                // Get Suggestions Button
-                Center(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF008A),
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                      textStyle: const TextStyle(fontSize: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: (_occasion != null && _dressType != null)
-                        ? () async {
-                      setState(() => _loading = true);
-                      try {
-                        // Build the search query from user input
-                        final query = [
-                          _occasion,
-                          _style,
-                          _dressType,
-                          'outfit ideas',
-                          _note
-                        ].where((e) => e != null && e.trim().isNotEmpty).join(' ');
-                        final results = await fetchOutfitImages(query);
-                        setState(() => _loading = false);
-
-                        // Navigate to the results page
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => OccasionResultsPage(results: results),
-                          ),
-                        );
-                      } catch (e) {
-                        setState(() => _loading = false);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error: $e')),
-                        );
-                      }
-                    }
-                        : null,
-                    child: const Text("Get Outfit Images"),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                if (_occasion == null || _dressType == null)
-                  const Center(
-                    child: Text(
-                      "Please select at least an occasion and a dress type.",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
+                Text('Min: \$${_priceRange.start.round()}'),
+                Text('Max: \$${_priceRange.end.round()}'),
               ],
             ),
-          ),
-          if (_loading)
-            Container(
-              color: Colors.black26,
-              child: const Center(child: CircularProgressIndicator()),
+            const SizedBox(height: 20),
+
+            // 4. User Input for Occasion Description
+            const Text(
+              'Describe the Occasion (Optional):',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
             ),
-        ],
+            const SizedBox(height: 10),
+            TextField(
+              maxLines: 3,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText:
+                    'e.g., "a beach wedding in the evening", "a formal business dinner"',
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _occasionDescription = value;
+                });
+              },
+            ),
+            const SizedBox(height: 30),
+
+            // 5. Inspiration Boards (Now moved up)
+            const Text(
+              'Inspiration for Different Occasions:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 10),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildInspirationCard(
+                    'Formal',
+                    'assets/formal_inspiration.jpg',
+                    0.6,
+                  ),
+                  const SizedBox(width: 10),
+                  _buildInspirationCard(
+                    'Casual',
+                    'assets/casual_inspiration.jpg',
+                    0.6,
+                  ),
+                  const SizedBox(width: 10),
+                  _buildInspirationCard(
+                    'Party',
+                    'assets/party_inspiration.jpg',
+                    0.6,
+                  ),
+                  const SizedBox(width: 10),
+                  _buildInspirationCard(
+                    'Work',
+                    'assets/work_inspiration.jpg',
+                    0.6,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30), // Added some space after inspiration
+            // 6. Button to trigger search/suggestions (Now at the end)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  // TODO: Implement logic to fetch outfit suggestions based on selected filters
+                  print('Selected Occasion: $_selectedOccasion');
+                  print('Selected Style: $_selectedStyle');
+                  print(
+                    'Price Range: ${_priceRange.start} - ${_priceRange.end}',
+                  );
+                  print('Occasion Description: $_occasionDescription');
+                  // Navigate to a page displaying outfit suggestions
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF008A),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text(
+                  'Find Outfit Suggestions',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
-}
 
-// --- Results Page with Add to Cart Button ---
-class OccasionResultsPage extends StatefulWidget {
-  final List<Map<String, String>> results;
-
-  const OccasionResultsPage({Key? key, required this.results}) : super(key: key);
-
-  @override
-  State<OccasionResultsPage> createState() => _OccasionResultsPageState();
-}
-
-class _OccasionResultsPageState extends State<OccasionResultsPage> {
-  final Set<int> _cartIndices = {};
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Outfit Suggestions'),
-        backgroundColor: const Color(0xFFFF008A),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const CartPage()));
-            },
+  Widget _buildInspirationCard(String title, String imagePath, double opacity) {
+    return InkWell(
+      onTap: () {
+        // TODO: Implement navigation to a page with more details or suggestions based on this inspiration
+        print('Tapped on $title inspiration');
+      },
+      child: SizedBox(
+        width: 150,
+        height: 180,
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
-        ],
-      ),
-      body: widget.results.isEmpty
-          ? const Center(child: Text("No images found."))
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
-            childAspectRatio: 0.7,
-          ),
-          itemCount: widget.results.length,
-          itemBuilder: (context, index) {
-            final item = widget.results[index];
-            final inCart = _cartIndices.contains(index);
-            return Card(
-              elevation: 4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: item['image'] != null && item['image']!.isNotEmpty
-                        ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        item['image']!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image, size: 60),
-                      ),
-                    )
-                        : Container(
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.image, size: 60),
-                    ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(imagePath, fit: BoxFit.cover),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(opacity),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      item['title'] ?? "Outfit",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: inCart ? Colors.green : const Color(0xFFFF008A),
-                        minimumSize: const Size.fromHeight(36),
-                      ),
-                      onPressed: inCart
-                          ? null
-                          : () {
-                        setState(() {
-                          _cartIndices.add(index);
-                        });
-                        // Add to global cart
-                        CartManager().add(CartItem(
-                          title: item['title'] ?? 'Outfit',
-                          imageUrl: item['image'] ?? '',
-                          price: 499.0, // Example price
-                        ));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Added to cart!')),
-                        );
-                      },
-                      icon: Icon(
-                        inCart ? Icons.check : Icons.add_shopping_cart,
-                        size: 18,
-                      ),
-                      label: Text(inCart ? "Added" : "Add to Cart"),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
+                ),
               ),
-            );
-          },
+              Positioned(
+                bottom: 10,
+                left: 10,
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

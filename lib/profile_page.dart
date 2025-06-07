@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -9,159 +8,45 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController(
+    text: 'user@example.com',
+  );
+  final TextEditingController _phoneController = TextEditingController(
+    text: '9876543210',
+  );
+  final TextEditingController _fullNameController = TextEditingController(
+    text: 'John Doe',
+  );
+  final TextEditingController _dobController = TextEditingController(
+    text: '01/01/2000',
+  );
   String _selectedGender = 'Female';
 
-  bool _isLoading = true;
-  String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchProfile();
-  }
-
-  Future<void> _fetchProfile() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser;
-    if (user == null) {
-      setState(() {
-        _errorMessage = "User not authenticated.";
-        _isLoading = false;
-      });
-      return;
-    }
-
-    try {
-      final response = await supabase
-          .from('user_profiles')
-          .select()
-          .eq('user_id', user.id)
-          .single();
-
-      // If no profile found, set defaults
-      if (response == null) {
-        setState(() {
-          _emailController.text = user.email ?? '';
-          _phoneController.text = '';
-          _fullNameController.text = '';
-          _dobController.text = '';
-          _selectedGender = 'Female';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      setState(() {
-        _emailController.text = response['email'] ?? '';
-        _phoneController.text = response['phone'] ?? '';
-        _fullNameController.text = response['full_name'] ?? '';
-        _dobController.text = response['dob'] != null && response['dob'] != ''
-            ? _formatDate(response['dob'])
-            : '';
-        _selectedGender = response['gender'] ?? 'Female';
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = "Failed to load profile: $e";
-        _isLoading = false;
-      });
-    }
-  }
-
-  String _formatDate(String isoDate) {
-    // Converts "YYYY-MM-DD" to "DD/MM/YYYY"
-    final parts = isoDate.split('-');
-    if (parts.length == 3) {
-      return "${parts[2]}/${parts[1]}/${parts[0]}";
-    }
-    return isoDate;
-  }
-
-  String _toIsoDate(String date) {
-    // Converts "DD/MM/YYYY" to "YYYY-MM-DD"
-    final parts = date.split('/');
-    if (parts.length == 3) {
-      return "${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}";
-    }
-    return date;
-  }
-
   Future<void> _selectDate(BuildContext context) async {
-    DateTime initialDate = DateTime.now();
-    if (_dobController.text.isNotEmpty) {
-      try {
-        final parts = _dobController.text.split('/');
-        if (parts.length == 3) {
-          initialDate = DateTime(
-            int.parse(parts[2]),
-            int.parse(parts[1]),
-            int.parse(parts[0]),
-          );
-        }
-      } catch (_) {}
-    }
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: initialDate,
+      initialDate: DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
     if (picked != null) {
       setState(() {
-        _dobController.text =
-        "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+        _dobController.text = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
   }
 
-  Future<void> _saveProfile() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+  void _saveProfile() {
+    print('Saving Profile...');
+    print('Email: ${_emailController.text}');
+    print('Phone: ${_phoneController.text}');
+    print('Full Name: ${_fullNameController.text}');
+    print('Date of Birth: ${_dobController.text}');
+    print('Gender: $_selectedGender');
 
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser;
-    if (user == null) {
-      setState(() {
-        _errorMessage = "User not authenticated.";
-        _isLoading = false;
-      });
-      return;
-    }
-
-    try {
-      await supabase.from('user_profiles').upsert({
-        'user_id': user.id,
-        'email': _emailController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'full_name': _fullNameController.text.trim(),
-        'dob': _toIsoDate(_dobController.text.trim()),
-        'gender': _selectedGender,
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile Saved!')),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = "Failed to save profile: $e";
-      });
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Profile Saved! (Simulated)')));
   }
 
   void _editProfile() {
@@ -172,22 +57,20 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 80.0,
+        toolbarHeight: 80.0, // Increased the height of the AppBar
         backgroundColor: const Color(0xFFFF008A),
         title: const Text(
           'Profile',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 30,
+            fontWeight: FontWeight.bold, // Made the title bold
+            fontSize: 30, // Optional: Increased font size for better visibility
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       backgroundColor: Colors.white,
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -199,14 +82,6 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Icon(Icons.person, size: 60, color: Colors.grey),
             ),
             const SizedBox(height: 30),
-            if (_errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
             TextField(
               controller: _emailController,
               readOnly: true,
@@ -326,7 +201,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: _editProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -340,7 +218,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: _saveProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF008A),
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
