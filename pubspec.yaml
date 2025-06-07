@@ -13,6 +13,13 @@ dependencies:
   cupertino_icons: ^1.0.6 # Or whatever version you have
   intl: ^0.18.1 # Assuming you've already added this for the previous error
   http: ^1.2.1 # Use the latest stable version of http
+  geolocator: ^10.1.0 # ✏️ Replace with lower version
+  geocoding: ^2.0.5
+
+  permission_handler: ^11.0.1 # ✏️ Replace with lower version
+
+
+
 
 dev_dependencies:
   flutter_test:
@@ -35,4 +42,9 @@ flutter:
     - assets/images/features_background_image.png
     - assets/images/girls_cutout.png
     - assets/images/profile_icon_design.png
+    - assets/images/hot_weather.jpg
+    - assets/images/normal_weather.jpg
+    - assets/images/rainy_weather.jpg
+    - assets/images/cold_weather.jpg
+    - assets/images/fog_weather.jpg
   # Ensure you include all individual image paths here
