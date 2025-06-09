@@ -1,3 +1,4 @@
+// Merged SignInPage with UI from your version and logic from her version (Supabase Auth)
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -39,24 +40,20 @@ class _SignInPageState extends State<SignInPage> {
           password: password,
         );
 
-        final user = response.user;
-        if (user == null) {
-          throw Exception('Supabase Auth: User sign-in failed.');
+        if (response.user == null) {
+          throw Exception('Sign-in failed.');
         }
 
         if (mounted) {
-          // Navigate to the features page after successful sign-in
           Navigator.pushReplacementNamed(context, '/features');
         }
       } on AuthException catch (error) {
         setState(() {
           _errorMessage = 'Auth error: ${error.message}';
-          _isLoading = false;
         });
       } catch (error) {
         setState(() {
           _errorMessage = 'An error occurred: $error';
-          _isLoading = false;
         });
       } finally {
         if (mounted) {
@@ -75,16 +72,13 @@ class _SignInPageState extends State<SignInPage> {
     });
     try {
       await _supabase.auth.signInWithOAuth(OAuthProvider.google);
-      // The OAuth flow will redirect, so navigation may be handled elsewhere.
     } on AuthException catch (error) {
       setState(() {
         _errorMessage = 'Google sign-in error: ${error.message}';
-        _isLoading = false;
       });
     } catch (error) {
       setState(() {
         _errorMessage = 'Error during Google sign-in: $error';
-        _isLoading = false;
       });
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -93,6 +87,9 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double headerHeight = screenHeight * 0.35;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -100,51 +97,74 @@ class _SignInPageState extends State<SignInPage> {
           key: _formKey,
           child: Column(
             children: [
-              Container(
-                color: const Color(0xFFFF008A),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
-                child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Welcome Back!",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                          fontSize: 26,
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    color: const Color(0xFFFF008A),
+                    height: headerHeight,
+                    padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+                    alignment: Alignment.bottomLeft,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            SizedBox(height: 10),
+                            Text(
+                              "Style in your way using",
+                              style: TextStyle(color: Colors.white, fontSize: 17),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              "LookWise..",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Sign in to LookWise..",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 34,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                  Positioned(
+                    top: screenHeight * 0.18,
+                    right: 0,
+                    width: 150,
+                    height: 150,
+                    child: Image.asset('assets/images/girls_cutout.png', fit: BoxFit.contain),
+                  ),
+                  Positioned(
+                    top: 60,
+                    right: 30,
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 25,
+                      child: Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Image(image: AssetImage('assets/images/profile_icon_design.png')),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 40),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                decoration: const BoxDecoration(color: Colors.white),
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Text(
-                      "Sign In",
-                      style: TextStyle(
-                        color: Color(0xFFFF008A),
-                        fontSize: 28,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      "Sign in",
+                      style: TextStyle(color: Color(0xFFFF008A), fontSize: 28, fontWeight: FontWeight.w700),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 35),
                     _buildTextField(
                       controller: _emailController,
                       label: 'E-mail',
@@ -161,7 +181,7 @@ class _SignInPageState extends State<SignInPage> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     _buildTextField(
                       controller: _passwordController,
                       label: 'Password',
@@ -177,10 +197,18 @@ class _SignInPageState extends State<SignInPage> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 15),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {},
+                        child: const Text("Forgot password?", style: TextStyle(color: Colors.black54)),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
-                      height: 50,
+                      height: 55,
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _signIn,
                         style: ElevatedButton.styleFrom(
@@ -190,60 +218,54 @@ class _SignInPageState extends State<SignInPage> {
                           ),
                         ),
                         child: _isLoading
-                            ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        )
-                            : const Text("Sign In", style: TextStyle(fontSize: 18)),
+                            ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
+                            : const Text("Sign In", style: TextStyle(fontSize: 20, color: Colors.white)),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
                     const Row(
                       children: [
-                        Expanded(child: Divider(thickness: 1)),
+                        Expanded(child: Divider(thickness: 1, color: Colors.grey)),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text("or", style: TextStyle(color: Color(0xFFFF008A))),
+                          child: Text("or", style: TextStyle(color: Colors.grey)),
                         ),
-                        Expanded(child: Divider(thickness: 1)),
+                        Expanded(child: Divider(thickness: 1, color: Colors.grey)),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    OutlinedButton(
-                      onPressed: _isLoading ? null : _signInWithGoogle,
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.black),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                    const SizedBox(height: 28),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: OutlinedButton(
+                        onPressed: _isLoading ? null : _signInWithGoogle,
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.black),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                      ),
-                      child: const Text(
-                        "Sign In with Google",
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        child: const Text("Sign In with Google",
+                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 35),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Don't have an account? "),
+                        const Text("Don’t have an account? "),
                         GestureDetector(
                           onTap: () => Navigator.pushNamed(context, '/signup'),
-                          child: const Text(
-                            "Sign up",
-                            style: TextStyle(
-                                color: Colors.purple, fontWeight: FontWeight.bold),
-                          ),
+                          child: const Text("Sign Up",
+                              style: TextStyle(color: Color(0xFF673AB7), fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
                     if (_errorMessage.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
-                        child: Text(
-                          _errorMessage,
-                          style: const TextStyle(color: Colors.red),
-                        ),
+                        child: Text(_errorMessage, style: const TextStyle(color: Colors.red)),
                       ),
                   ],
                 ),
@@ -268,14 +290,15 @@ class _SignInPageState extends State<SignInPage> {
       keyboardType: keyboardType,
       obscureText: isPassword,
       decoration: InputDecoration(
-        prefixIcon: Icon(icon),
-        labelText: label,
+        prefixIcon: Icon(icon, color: const Color(0xFFC0C0C0)),
+        hintText: label,
         filled: true,
         fillColor: Colors.grey[200],
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide.none,
         ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
       ),
       validator: validator,
     );

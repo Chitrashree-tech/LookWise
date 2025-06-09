@@ -15,6 +15,7 @@ import 'screens/shop_for_occasions_page.dart';
 import 'screens/restyle_my_wardrode_page.dart';
 import 'screens/chatbot_page.dart';
 import 'profile_page.dart';
+import 'identify_face_shape_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,8 @@ class MyApp extends StatelessWidget {
         '/daily_outfit_suggestions': (context) => const DailyOutfitSuggestionsPage(),
         '/shop_daily_clothing': (context) => const ShopDailyClothingPage(),
         '/chatbot': (context) => const ChatbotPage(),
+        '/identifyFace': (context) => const IdentifyFaceShapePage(),
+
       },
     );
   }

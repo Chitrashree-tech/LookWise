@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'find_body_type_page.dart';
 
 class BodyTypeSelectionPage extends StatefulWidget {
   const BodyTypeSelectionPage({super.key});
@@ -84,27 +85,31 @@ class _BodyTypeSelectionPageState extends State<BodyTypeSelectionPage> {
                   Text(
                     "LookWise..",
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 20,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
                     ),
                   ),
                   CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 20,
-                    child: Icon(Icons.person, color: Color(0xFFFF008A)),
+                    child: Padding(
+                      padding: EdgeInsets.all(5.0),
+                      child: Image(
+                        image: AssetImage('assets/images/profile_icon_design.png'),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 40),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Text(
                 "Which body type best characterizes your shape?",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),
             ),
             const SizedBox(height: 25),
@@ -194,22 +199,32 @@ class _BodyTypeSelectionPageState extends State<BodyTypeSelectionPage> {
               ),
             ),
             const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text.rich(
-                  TextSpan(
-                    text: "Unsure about your body type? ",
-                    children: [
-                      TextSpan(
-                        text: "Click here!",
-                        style: TextStyle(
-                          color: Colors.blueAccent,
-                          decoration: TextDecoration.underline,
-                        ),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const FindBodyTypePage(),
                       ),
-                    ],
+                    );
+                  },
+                  child: const Text.rich(
+                    TextSpan(
+                      text: "Unsure about your body type? ",
+                      children: [
+                        TextSpan(
+                          text: "Click here!",
+                          style: TextStyle(
+                            color: Colors.blueAccent,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

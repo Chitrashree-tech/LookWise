@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'create_profile.dart'; // Make sure this import is correct for your project
+import 'create_profile.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -14,9 +14,9 @@ class _SignUpPageState extends State<SignUpPage> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _supabaseClient = Supabase.instance.client;
   bool _isLoading = false;
   String _errorMessage = '';
-  final _supabaseClient = Supabase.instance.client;
 
   @override
   void dispose() {
@@ -35,11 +35,10 @@ class _SignUpPageState extends State<SignUpPage> {
     });
 
     final email = _emailController.text.trim();
-    final phoneNumber = _phoneController.text.trim();
+    final phone = _phoneController.text.trim();
     final password = _passwordController.text.trim();
 
     try {
-      // 1. Sign up with Supabase Auth
       final response = await _supabaseClient.auth.signUp(
         email: email,
         password: password,
@@ -48,20 +47,16 @@ class _SignUpPageState extends State<SignUpPage> {
       if (user == null) {
         setState(() {
           _errorMessage = 'Sign up failed. Please try again.';
-          _isLoading = false;
         });
         return;
       }
-      final userId = user.id;
 
-      // 2. Insert user profile into 'users' table (optional if you want to keep extra info)
       await _supabaseClient.from('users').insert({
-        'id': userId,
+        'id': user.id,
         'email': email,
-        'phone': phoneNumber,
+        'phone': phone,
       });
 
-      // 3. Navigate to CreateProfilePage, passing userId, email, phone
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Signup successful!')),
@@ -70,33 +65,22 @@ class _SignUpPageState extends State<SignUpPage> {
           context,
           MaterialPageRoute(
             builder: (context) => CreateProfilePage(
-              userId: userId,
+              userId: user.id,
               email: email,
-              phone: phoneNumber,
+              phone: phone,
             ),
           ),
         );
       }
-    } on PostgrestException catch (error) {
-      setState(() {
-        _errorMessage = 'Supabase Database: Failed to store user data. ${error.message}';
-        _isLoading = false;
-      });
-    } on AuthException catch (error) {
-      setState(() {
-        _errorMessage = 'Auth error: ${error.message}';
-        _isLoading = false;
-      });
-    } catch (error) {
-      setState(() {
-        _errorMessage = 'An error occurred: $error';
-        _isLoading = false;
-      });
+    } on PostgrestException catch (e) {
+      _errorMessage = 'Database error: ${e.message}';
+    } on AuthException catch (e) {
+      _errorMessage = 'Auth error: ${e.message}';
+    } catch (e) {
+      _errorMessage = 'Unexpected error: $e';
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -112,37 +96,54 @@ class _SignUpPageState extends State<SignUpPage> {
             children: [
               Container(
                 color: const Color(0xFFFF008A),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
-                child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Create your account using",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                          fontSize: 26,
+                padding: const EdgeInsets.fromLTRB(30, 100, 30, 80),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "Style in your way using",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            "LookWise..",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 38,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 25,
+                      child: Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Image(
+                          image: AssetImage(
+                            'assets/images/profile_icon_design.png',
+                          ),
                         ),
                       ),
-                      SizedBox(height: 5),
-                      Text(
-                        "LookWise..",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 34,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 40),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
+                transform: Matrix4.translationValues(0.0, -30.0, 0.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -150,63 +151,52 @@ class _SignUpPageState extends State<SignUpPage> {
                       "Sign Up",
                       style: TextStyle(
                         color: Color(0xFFFF008A),
-                        fontSize: 28,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 30),
                     _buildTextField(
                       controller: _emailController,
-                      label: 'E-mail',
+                      labelText: "E-mail",
                       icon: Icons.email,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        if (!RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                            .hasMatch(value)) {
-                          return 'Please enter a valid email';
+                        if (value == null || value.isEmpty) return 'Enter your email';
+                        if (!RegExp(r"^[\w-.]+@([\w-]+\.)+[\w]{2,4}$").hasMatch(value)) {
+                          return 'Enter a valid email';
                         }
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
                     _buildTextField(
                       controller: _phoneController,
-                      label: 'Phone Number',
+                      labelText: "Phone Number",
                       icon: Icons.phone,
                       keyboardType: TextInputType.phone,
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Enter phone number';
-                        }
-                        if (value.length < 10) {
-                          return 'Enter a valid phone number';
-                        }
+                        if (value == null || value.isEmpty) return 'Enter phone number';
+                        if (value.length < 10) return 'Enter a valid phone number';
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
                     _buildTextField(
                       controller: _passwordController,
-                      label: 'Password',
+                      labelText: "Password",
                       icon: Icons.lock,
                       isPassword: true,
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Enter password';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
+                        if (value == null || value.isEmpty) return 'Enter password';
+                        if (value.length < 6) return 'At least 6 characters';
                         return null;
                       },
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
                     SizedBox(
                       width: double.infinity,
-                      height: 50,
+                      height: 55,
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _signUp,
                         style: ElevatedButton.styleFrom(
@@ -219,53 +209,74 @@ class _SignUpPageState extends State<SignUpPage> {
                             ? const CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         )
-                            : const Text("Sign Up", style: TextStyle(fontSize: 18)),
+                            : const Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
                     const Row(
                       children: [
-                        Expanded(child: Divider(thickness: 1)),
+                        Expanded(child: Divider(thickness: 1, color: Colors.grey)),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text("or", style: TextStyle(color: Color(0xFFFF008A))),
+                          child: Text("or", style: TextStyle(color: Colors.grey)),
                         ),
-                        Expanded(child: Divider(thickness: 1)),
+                        Expanded(child: Divider(thickness: 1, color: Colors.grey)),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.black),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: OutlinedButton(
+                        onPressed: () {},
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.grey.shade400, width: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          backgroundColor: Colors.white,
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                      ),
-                      child: const Text(
-                        "Sign Up with Google",
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        child: const Text(
+                          "Sign Up with Google",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Already have an account? "),
+                        const Text(
+                          "Already have an account? ",
+                          style: TextStyle(fontSize: 16),
+                        ),
                         GestureDetector(
                           onTap: () => Navigator.pushNamed(context, '/signin'),
                           child: const Text(
                             "Sign in",
                             style: TextStyle(
-                                color: Colors.purple, fontWeight: FontWeight.bold),
+                              color: Color(0xFFFF008A),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ],
                     ),
                     if (_errorMessage.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: const EdgeInsets.only(top: 16),
                         child: Text(
                           _errorMessage,
                           style: const TextStyle(color: Colors.red),
@@ -283,27 +294,32 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _buildTextField({
     required TextEditingController controller,
-    required String label,
+    required String labelText,
     required IconData icon,
     required String? Function(String?) validator,
     TextInputType keyboardType = TextInputType.text,
     bool isPassword = false,
   }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        prefixIcon: Icon(icon),
-        labelText: label,
-        filled: true,
-        fillColor: Colors.grey[200],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
+    return SizedBox(
+      height: 55,
+      child: TextFormField(
+        controller: controller,
+        obscureText: isPassword,
+        keyboardType: keyboardType,
+        validator: validator,
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: const Color(0xFFC0C0C0)),
+          labelText: labelText,
+          labelStyle: TextStyle(color: Colors.grey[700]),
+          filled: true,
+          fillColor: Colors.grey[200],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 15),
         ),
       ),
-      validator: validator,
     );
   }
 }

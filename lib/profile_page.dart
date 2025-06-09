@@ -47,7 +47,6 @@ class _ProfilePageState extends State<ProfilePage> {
           .eq('user_id', user.id)
           .single();
 
-      // If no profile found, set defaults
       if (response == null) {
         setState(() {
           _emailController.text = user.email ?? '';
@@ -79,7 +78,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String _formatDate(String isoDate) {
-    // Converts "YYYY-MM-DD" to "DD/MM/YYYY"
     final parts = isoDate.split('-');
     if (parts.length == 3) {
       return "${parts[2]}/${parts[1]}/${parts[0]}";
@@ -88,7 +86,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String _toIsoDate(String date) {
-    // Converts "DD/MM/YYYY" to "YYYY-MM-DD"
     final parts = date.split('/');
     if (parts.length == 3) {
       return "${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}";
@@ -271,7 +268,8 @@ class _ProfilePageState extends State<ProfilePage> {
               children: <Widget>[
                 const Text(
                   'Gender',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style:
+                  TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(width: 20),
                 GestureDetector(
@@ -326,7 +324,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: _editProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -339,8 +338,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ElevatedButton(
                   onPressed: _saveProfile,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF008A),
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    backgroundColor: Color(0xFFFF008A),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

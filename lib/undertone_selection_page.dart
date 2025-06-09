@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'find_undertone_page.dart'; // Make sure this path is correct
+
 class UndertoneSelectionPage extends StatefulWidget {
   const UndertoneSelectionPage({super.key});
 
@@ -62,87 +64,95 @@ class _UndertoneSelectionPageState extends State<UndertoneSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              color: const Color(0xFFFF008A),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              width: double.infinity,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Icon(Icons.menu, color: Colors.white),
-                  Text(
-                    "LookWise..",
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 20,
-                    child: Icon(Icons.face, color: Color(0xFFFF008A)),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                "Which undertone best characterizes your shape?",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ...undertones.map((tone) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedUndertone = tone;
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(12),
-                    color: selectedUndertone == tone
-                        ? Colors.grey.shade200
-                        : Colors.white,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        selectedUndertone == tone
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_off,
-                        color: const Color(0xFFFF008A),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        tone,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ],
+      body: Column(
+        children: [
+          Container(
+            color: const Color(0xFFFF008A),
+            padding: EdgeInsets.fromLTRB(24, statusBarHeight + 20, 24, 20),
+            width: double.infinity,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Icon(Icons.menu, color: Colors.white),
+                Text(
+                  "LookWise..",
+                  style: TextStyle(
+                    fontSize: 28,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                  radius: 20,
+                  child: Icon(Icons.face, color: Color(0xFFFF008A)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 30),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              "Which undertone best characterizes your shape?",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
+            ),
+          ),
+          const SizedBox(height: 20),
+          ...undertones.map((tone) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedUndertone = tone;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(12),
+                  color: selectedUndertone == tone ? Colors.grey.shade200 : Colors.white,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      selectedUndertone == tone
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color: const Color(0xFFFF008A),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      tone,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
               ),
-            )),
-            const SizedBox(height: 16),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text.rich(
+            ),
+          )),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FindUndertonePage(),
+                    ),
+                  );
+                },
+                child: const Text.rich(
                   TextSpan(
                     text: "Unsure about your undertone? ",
                     children: [
@@ -158,44 +168,44 @@ class _UndertoneSelectionPageState extends State<UndertoneSelectionPage> {
                 ),
               ),
             ),
-            const Spacer(),
-            if (_errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                child: Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
+          ),
+          const Spacer(),
+          if (_errorMessage != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _saveUndertoneAndProceed,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF008A),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveUndertoneAndProceed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF008A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  )
-                      : const Text(
-                    "Go to Next Page",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
+                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                )
+                    : const Text(
+                  "Go to Next Page",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

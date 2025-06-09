@@ -13,11 +13,11 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
 
   String? _selectedType;
   final TextEditingController _colorController = TextEditingController();
-  final TextEditingController _specificTypeController = TextEditingController(); // For t-shirt, jeans, etc.
+  final TextEditingController _specificTypeController = TextEditingController();
   final TextEditingController _materialController = TextEditingController();
   final TextEditingController _styleController = TextEditingController();
-  final TextEditingController _accessoryTypeController = TextEditingController(); // Specific accessory
-  final TextEditingController _footwearKindController = TextEditingController(); // Kind of footwear
+  final TextEditingController _accessoryTypeController = TextEditingController();
+  final TextEditingController _footwearKindController = TextEditingController();
 
   final List<String> _clothingBaseTypes = [
     'Top',
@@ -32,6 +32,7 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
     if (_selectedType != null && _colorController.text.isNotEmpty) {
       String specificType = '';
       String footwearKind = '';
+
       if (_selectedType == 'Top' || _selectedType == 'Bottom') {
         specificType = _specificTypeController.text;
       } else if (_selectedType == 'Accessory') {
@@ -51,8 +52,6 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
 
       setState(() {
         _closet.add(newItem);
-        print('Added item: ${newItem.baseType}, ${newItem.color}, kind: ${newItem.footwearKind}, material: ${newItem.material}');
-        print('Current closet: $_closet'); // Print the entire list
         _selectedType = null;
         _colorController.clear();
         _specificTypeController.clear();
@@ -81,7 +80,9 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Your closet is empty. Add some items first.')),
+        const SnackBar(
+          content: Text('Your closet is empty. Add some items first.'),
+        ),
       );
     }
   }
@@ -95,7 +96,6 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
     List<ClothingItem> footwear = closet.where((item) => item.baseType == 'Footwear').toList();
     List<ClothingItem> accessories = closet.where((item) => item.baseType == 'Accessory').toList();
 
-    // Suggest dresses as standalone outfits with optional footwear and accessories
     for (var dress in dresses) {
       String suggestion = 'Suggestion: ${dress.color} ${dress.specificType ?? dress.baseType}';
       if (footwear.isNotEmpty) {
@@ -107,7 +107,6 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
       suggestions.add(suggestion);
     }
 
-    // Suggest tops with bottoms, optional outerwear, footwear, and accessories
     for (var top in tops) {
       for (var bottom in bottoms) {
         for (var shoe in footwear) {
@@ -121,7 +120,6 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
           }
           suggestions.add(suggestion);
         }
-        // If no footwear, still suggest the top and bottom (once per top-bottom pair)
         if (footwear.isEmpty) {
           String suggestion =
               'Suggestion: ${top.color} ${top.specificType ?? top.baseType} with ${bottom.color} ${bottom.specificType ?? bottom.baseType}';
@@ -137,8 +135,9 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
     }
 
     if (suggestions.isEmpty && closet.isNotEmpty) {
-      suggestions.add('No specific outfit combinations found based on types. '
-          'Try adding more variety to your closet!');
+      suggestions.add(
+        'No specific outfit combinations found based on types. Try adding more variety to your closet!',
+      );
     } else if (closet.isEmpty) {
       suggestions.add('Your closet is empty. Add some items to get suggestions!');
     }
@@ -150,8 +149,7 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Restyle My Wardrobe',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Restyle My Wardrobe', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFFFF008A),
       ),
       body: SingleChildScrollView(
@@ -159,8 +157,7 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Add Item to Your Closet',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            const Text('Add Item to Your Closet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(labelText: 'Base Type'),
@@ -168,23 +165,12 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
               items: _clothingBaseTypes
                   .map((type) => DropdownMenuItem(value: type, child: Text(type)))
                   .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedType = value;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please select a base type';
-                }
-                return null;
-              },
+              onChanged: (value) => setState(() => _selectedType = value),
             ),
             if (_selectedType == 'Top' || _selectedType == 'Bottom')
               TextField(
                 controller: _specificTypeController,
-                decoration: const InputDecoration(
-                    labelText: 'Specific Type (e.g., t-shirt, jeans)'),
+                decoration: const InputDecoration(labelText: 'Specific Type (e.g., t-shirt, jeans)'),
               ),
             if (_selectedType == 'Footwear')
               TextField(
@@ -196,37 +182,27 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
                 controller: _accessoryTypeController,
                 decoration: const InputDecoration(labelText: 'Accessory Type'),
               ),
-            if (_selectedType != 'Footwear')
-              TextField(
-                controller: _colorController,
-                decoration: const InputDecoration(labelText: 'Color'),
-              ),
-            if (_selectedType != 'Footwear' && _selectedType != 'Accessory')
-              TextField(
-                controller: _materialController,
-                decoration: const InputDecoration(labelText: 'Material (Optional)'),
-              ),
+            TextField(
+              controller: _colorController,
+              decoration: const InputDecoration(labelText: 'Color'),
+            ),
+            TextField(
+              controller: _materialController,
+              decoration: const InputDecoration(labelText: 'Material (Optional)'),
+            ),
             if (_selectedType != 'Footwear' && _selectedType != 'Accessory')
               TextField(
                 controller: _styleController,
                 decoration: const InputDecoration(labelText: 'Style (Optional)'),
               ),
-            if (_selectedType == 'Footwear')
-              TextField(
-                controller: _materialController,
-                decoration: const InputDecoration(labelText: 'Material (Optional)'),
-              ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _addItemToCloset,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF008A),
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF008A)),
               child: const Text('Add Item', style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 20),
-            const Text('Your Current Closet',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            const Text('Your Current Closet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
             const SizedBox(height: 10),
             _closet.isEmpty
                 ? const Text('Your closet is empty. Add some items!')
@@ -243,13 +219,15 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          item.baseType == 'Footwear'
-                              ? '${item.color} Footwear (${item.footwearKind ?? 'kind not specified'}) '
-                              '${item.material?.isNotEmpty == true ? "(${item.material})" : ""}'
-                              : '${item.color} ${item.specificType ?? item.baseType} '
-                              '${item.material?.isNotEmpty == true ? "(${item.material})" : ""} '
-                              '${item.style?.isNotEmpty == true ? "[${item.style}]" : ""}',
+                        Flexible(
+                          child: Text(
+                            item.baseType == 'Footwear'
+                                ? '${item.color} Footwear (${item.footwearKind ?? 'kind not specified'}) '
+                                '${item.material?.isNotEmpty == true ? "(${item.material})" : ""}'
+                                : '${item.color} ${item.specificType ?? item.baseType} '
+                                '${item.material?.isNotEmpty == true ? "(${item.material})" : ""} '
+                                '${item.style?.isNotEmpty == true ? "[${item.style}]" : ""}',
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
@@ -262,8 +240,7 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
               },
             ),
             const SizedBox(height: 20),
-            const Text('Outfit Suggestions',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+            const Text('Outfit Suggestions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
             const SizedBox(height: 10),
             _suggestions.isEmpty
                 ? const Text('No outfit suggestions yet. Add items and generate!')
@@ -284,9 +261,7 @@ class _RestyleMyWardrobePageState extends State<RestyleMyWardrobePage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _generateSuggestions,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF008A),
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF008A)),
               child: const Text('Generate Suggestions', style: TextStyle(color: Colors.white)),
             ),
           ],

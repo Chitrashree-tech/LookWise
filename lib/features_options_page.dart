@@ -43,16 +43,14 @@ class FeaturePage extends StatelessWidget {
           builder: (BuildContext context) {
             return IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
+              onPressed: () => Scaffold.of(context).openDrawer(),
             );
           },
         ),
         title: const Text(
           "LookWise..",
           style: TextStyle(
-            fontSize: 28,
+            fontSize: 24,
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontStyle: FontStyle.italic,
@@ -62,9 +60,7 @@ class FeaturePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, '/profile');
-              },
+              onTap: () => Navigator.pushNamed(context, '/profile'),
               child: const CircleAvatar(
                 backgroundColor: Colors.white,
                 radius: 20,
@@ -79,9 +75,7 @@ class FeaturePage extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Color(0xFFFF008A),
-              ),
+              decoration: const BoxDecoration(color: Color(0xFFFF008A)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -94,11 +88,7 @@ class FeaturePage extends StatelessWidget {
                   SizedBox(height: 10),
                   Text(
                     'User Account',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -123,24 +113,19 @@ class FeaturePage extends StatelessWidget {
             if (savedSuggestions.isNotEmpty) ...[
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Text(
-                  'Saved Suggestions',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                child: Text('Saved Suggestions', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               SizedBox(
                 height: 120,
                 child: ListView.builder(
                   itemCount: savedSuggestions.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(savedSuggestions[index]),
-                      onTap: () {
-                        Navigator.pop(context);
-                        // You can implement navigation or action for saved suggestion here
-                      },
-                    );
-                  },
+                  itemBuilder: (context, index) => ListTile(
+                    title: Text(savedSuggestions[index]),
+                    onTap: () {
+                      Navigator.pop(context);
+                      print('Tapped on saved suggestion: ${savedSuggestions[index]}');
+                    },
+                  ),
                 ),
               ),
               const Divider(),
@@ -156,85 +141,78 @@ class FeaturePage extends StatelessWidget {
           ],
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ListView.builder(
-                  itemCount: features.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 4,
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        leading: CircleAvatar(
-                          backgroundColor: const Color(0xFFFF008A),
-                          child: Icon(
-                            features[index].icon,
-                            color: Colors.white,
-                          ),
-                        ),
-                        title: Text(
-                          features[index].name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        onTap: () {
-                          if (features[index].name == 'Chatbot') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const ChatbotPage()),
-                            );
-                          } else {
-                            Navigator.pushNamed(context, features[index].route);
-                          }
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/features_background_image.png',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey.shade200),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CartPage()),
-                    );
-                  },
-                  icon: const Icon(Icons.shopping_cart, color: Colors.white),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF008A),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  label: const Text(
-                    "View Cart",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: ListView.builder(
+                      itemCount: features.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          color: Colors.white.withOpacity(0.85),
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            leading: CircleAvatar(
+                              backgroundColor: const Color(0xFFFF008A),
+                              child: Icon(features[index].icon, color: Colors.white),
+                            ),
+                            title: Text(
+                              features[index].name,
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                            ),
+                            onTap: () {
+                              if (features[index].name == 'Chatbot') {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatbotPage()));
+                              } else {
+                                Navigator.pushNamed(context, features[index].route);
+                              }
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const CartPage()));
+                      },
+                      icon: const Icon(Icons.shopping_cart, color: Colors.white),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF008A),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      ),
+                      label: const Text(
+                        "View Cart",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

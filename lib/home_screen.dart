@@ -12,19 +12,19 @@ class HomeScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 🔷 Pink Header Section (Sign In/Sign Up remains)
+            // 🔷 Header Section
             Container(
               height: screenHeight * 0.35,
               width: double.infinity,
-              color: const Color(0xFFFF008A),
+              color: const Color(0xFFFF008A).withOpacity(0.9),
               padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20), // Added vertical space at the top
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start, // Align items to the start (top)
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Column(
@@ -49,10 +49,19 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 16), // Add some space between text and avatar
-                      const CircleAvatar(
-                        backgroundColor: Colors.white,
+                      const SizedBox(width: 16),
+                      // ✅ Profile logo image (keep it)
+                      CircleAvatar(
                         radius: 35,
+                        backgroundColor: Colors.white,
+                        child: ClipOval(
+                          child: Image.asset(
+                            "assets/images/profile_icon_design.png",
+                            fit: BoxFit.cover,
+                            width: 70,
+                            height: 70,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -64,7 +73,9 @@ class HomeScreen extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushNamed(context, '/signin');
                         },
-                        style: TextButton.styleFrom(foregroundColor: Colors.white),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                        ),
                         child: const Text(
                           "Sign In",
                           style: TextStyle(fontSize: 18),
@@ -77,13 +88,16 @@ class HomeScreen extends StatelessWidget {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFFFF008A),
+                          foregroundColor: Color(0xFFFF008A),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
                         child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 10,
+                          ),
                           child: Text(
                             "Sign Up",
                             style: TextStyle(fontSize: 18),
@@ -97,28 +111,46 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            // 🔷 White Section with Tagline and Feature Descriptions
+            // 🔷 Tagline Section
             Container(
               width: double.infinity,
-              constraints: BoxConstraints(
-                minHeight: screenHeight * 0.65,
+              color: Colors.white.withOpacity(0.7),
+              padding: const EdgeInsets.symmetric(
+                vertical: 30,
+                horizontal: 20,
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: const Text(
+                "Here's what LookWise offers:",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFFF008A),
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            // 🔷 Features Section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 30,
+              ),
               child: Column(
                 children: [
-                  const SizedBox(height: 40),
-                  const Text(
-                    "Here's what LookWise offers:",
-                    style: TextStyle(
-                      color: Color(0xFFFF008A),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  _buildFeatureDescription(
+                    context,
+                    "Get weather-based outfit suggestions to stay stylish and comfortable.",
                   ),
-                  const SizedBox(height: 40),
-                  _buildFeatureDescription(context, "Get weather-based outfit suggestions to stay stylish and comfortable."),
-                  _buildFeatureDescription(context, "Discover trendy outfits that fit your budget and preferences."),
-                  _buildFeatureDescription(context, "Explore personalized clothing recommendations from top online platforms."),
+                  _buildFeatureDescription(
+                    context,
+                    "Discover trendy outfits that fit your budget and preferences.",
+                  ),
+                  _buildFeatureDescription(
+                    context,
+                    "Explore personalized clothing recommendations from Amazon, Flipkart, Myntra & more.",
+                  ),
                   const SizedBox(height: 30),
                 ],
               ),
@@ -131,22 +163,26 @@ class HomeScreen extends StatelessWidget {
 
   static Widget _buildFeatureDescription(BuildContext context, String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: ElevatedButton(
-        onPressed: null, // Set onPressed to null to disable the button effect
+        onPressed: null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.white.withOpacity(0.9),
           foregroundColor: const Color(0xFFFF008A),
-          side: const BorderSide(color: Color(0xFFFF008A)),
-          padding: const EdgeInsets.symmetric(vertical: 18),
+          side: const BorderSide(color: Color(0xFFFF008A), width: 1.5),
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
+          elevation: 0,
         ),
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 16),
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: 'OpenSans',
+          ),
         ),
       ),
     );

@@ -42,14 +42,14 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
     });
 
     try {
-      final response = await _supabase.from('user_profiles').insert({
+      await _supabase.from('user_profiles').insert({
         'user_id': widget.userId,
         'email': widget.email,
         'phone': widget.phone,
         'full_name': _fullNameController.text.trim(),
         'dob': _dobController.text.trim(),
         'gender': selectedGender,
-      }).select();
+      });
 
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/body_type');
@@ -57,12 +57,10 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
     } on PostgrestException catch (error) {
       setState(() {
         _errorMessage = 'Failed to save profile: ${error.message}';
-        _isLoading = false;
       });
     } catch (error) {
       setState(() {
         _errorMessage = 'An error occurred: $error';
-        _isLoading = false;
       });
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -71,174 +69,191 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Container(
-                  color: const Color(0xFFFF008A),
-                  padding: const EdgeInsets.fromLTRB(24, 30, 24, 20),
-                  width: double.infinity,
-                  child: const Text(
-                    "LookWise..",
-                    style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // Header
+              Container(
+                color: const Color(0xFFFF008A),
+                padding: EdgeInsets.fromLTRB(30, statusBarHeight + 20, 24, 20),
+                width: double.infinity,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "LookWise..",
+                      style: TextStyle(
+                        fontSize: 22,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
+                    const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 20,
+                      child: Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Icon(Icons.person, color: Color(0xFFFF008A)),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                const CircleAvatar(
+              ),
+              const SizedBox(height: 60),
+              GestureDetector(
+                onTap: () {
+                  print("Tap to add/change profile image");
+                },
+                child: const CircleAvatar(
                   radius: 60,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, size: 60, color: Colors.white),
+                  backgroundColor: Color(0xFFE0E0E0),
+                  child: Icon(Icons.person, size: 60, color: Color(0xFFBDBDBD)),
                 ),
-                const SizedBox(height: 30),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    children: [
-                      // Email (read-only)
-                      TextFormField(
-                        initialValue: widget.email,
-                        enabled: false,
-                        decoration: InputDecoration(
-                          labelText: "E-mail",
-                          prefixIcon: const Icon(Icons.email, color: Colors.black),
-                          filled: true,
-                          fillColor: Colors.grey[300],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // Phone (read-only)
-                      TextFormField(
-                        initialValue: widget.phone,
-                        enabled: false,
-                        decoration: InputDecoration(
-                          labelText: "Phone Number",
-                          prefixIcon: const Icon(Icons.phone, color: Colors.black),
-                          filled: true,
-                          fillColor: Colors.grey[300],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // Full Name
-                      TextFormField(
-                        controller: _fullNameController,
-                        decoration: InputDecoration(
-                          labelText: "Full Name",
-                          prefixIcon: const Icon(Icons.person, color: Colors.black),
-                          filled: true,
-                          fillColor: Colors.grey[300],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
+              ),
+              const SizedBox(height: 30),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    // Email (readonly)
+                    buildReadonlyField(Icons.email, "E-mail", widget.email),
+                    const SizedBox(height: 12),
+                    // Phone (readonly)
+                    buildReadonlyField(Icons.phone, "Phone Number", widget.phone),
+                    const SizedBox(height: 12),
+                    // Full Name
+                    buildTextField(Icons.person, "Full Name", _fullNameController,
                         validator: (value) =>
-                        value == null || value.isEmpty ? "Enter full name" : null,
-                      ),
-                      const SizedBox(height: 12),
-                      // Date of Birth
-                      TextFormField(
-                        controller: _dobController,
-                        decoration: InputDecoration(
-                          labelText: "Date of Birth",
-                          prefixIcon: const Icon(Icons.cake, color: Colors.black),
-                          filled: true,
-                          fillColor: Colors.grey[300],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        validator: (value) =>
-                        value == null || value.isEmpty ? "Enter date of birth" : null,
-                        onTap: () async {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                          DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime(2000),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
-                          );
-                          if (pickedDate != null) {
-                            _dobController.text =
-                            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: const Text(
-                              "Gender",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          genderOption("Male"),
-                          const SizedBox(width: 12),
-                          genderOption("Female"),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _createProfile,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF008A),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: _isLoading
-                              ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          )
-                              : const Text(
-                            "Create",
-                            style: TextStyle(fontSize: 18),
-                          ),
+                        value == null || value.isEmpty ? "Enter full name" : null),
+                    const SizedBox(height: 12),
+                    // Date of Birth
+                    TextFormField(
+                      controller: _dobController,
+                      decoration: InputDecoration(
+                        labelText: "Date of Birth",
+                        prefixIcon: const Icon(Icons.cake, color: Colors.black),
+                        filled: true,
+                        fillColor: Colors.grey[300],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
                         ),
                       ),
-                      if (_errorMessage.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            _errorMessage,
-                            style: const TextStyle(color: Colors.red),
+                      validator: (value) =>
+                      value == null || value.isEmpty ? "Enter date of birth" : null,
+                      onTap: () async {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime(2000),
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime.now(),
+                        );
+                        if (pickedDate != null) {
+                          _dobController.text =
+                          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    // Gender
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: const Text(
+                            "Gender",
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
-                    ],
-                  ),
+                        const SizedBox(width: 12),
+                        genderOption("Male"),
+                        const SizedBox(width: 12),
+                        genderOption("Female"),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    // Create Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _createProfile,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF008A),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        )
+                            : const Text(
+                          "Create",
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    if (_errorMessage.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          _errorMessage,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 40),
-              ],
-            ),
+              ),
+              const SizedBox(height: 40),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildReadonlyField(IconData icon, String label, String value) {
+    return TextFormField(
+      initialValue: value,
+      enabled: false,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: Colors.black),
+        filled: true,
+        fillColor: Colors.grey[300],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextField(IconData icon, String label, TextEditingController controller,
+      {String? Function(String?)? validator}) {
+    return TextFormField(
+      controller: controller,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: Colors.black),
+        filled: true,
+        fillColor: Colors.grey[300],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
     );
@@ -246,7 +261,6 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
 
   Widget genderOption(String gender) {
     bool isSelected = selectedGender == gender;
-
     return InkWell(
       onTap: () {
         setState(() {
@@ -264,7 +278,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
               border: Border.all(color: Colors.purpleAccent),
             ),
             child: isSelected
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
+                ? const Icon(Icons.check, size: 14, color: Colors.white)
                 : null,
           ),
           const SizedBox(width: 6),
